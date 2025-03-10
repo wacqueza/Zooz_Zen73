@@ -1,144 +1,155 @@
 blueprint:
-  name: Zooz Zen73 Template
-  description: Create automations for Zooz Zen73 Switches using scenes
-  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen_blueprint_template.yaml
+  name: Zooz ZEN
+  description: Zooz ZEN Switch using the ZWave-JS integration. 
   domain: automation
   input:
-    zooz_switch:
-      name: Zooz Zen73 Switch
-      description: "Select the Zooz Zen73 switch to configure."
+    zwave_device:
+      name: Zooz ZEN
+      description: "List of available Zooz ZEN34 switch."
       selector:
-        entity:
-          integration: zwave_js
-          domain: switch
+          device:
+            integration: zwave_js
+            manufacturer: Zooz
+            model: 
 
-    on_1x:
-      name: Press On (1x)
-      description: Action to run on button press.
+
+    KeyReleased_Up:
+      name: Up Released
+      description: "Action to run, when the button is released."
       default: []
       selector:
         action: {}
-    on_2x:
-      name: Press On (2x)
-      description: Action to run on button press.
+    KeyReleased_Down:
+      name: Down Released
+      description: "Action to run, when the button is released."
       default: []
       selector:
         action: {}
-    on_3x:
-      name: Press On (3x)
-      description: Action to run on button press.
+
+    KeyHeld_Up:
+      name: Up Held
+      description: "Action to run, when the button is held."
       default: []
       selector:
         action: {}
-    on_4x:
-      name: Press On (4x)
-      description: Action to run on button press.
+    KeyHeld_Down:
+      name: Down Held
+      description: "Action to run, when the button is held."
       default: []
       selector:
         action: {}
-    on_5x:
-      name: Press On (5x)
-      description: Action to run on button press.
+
+    KeyPressed_Up:
+      name: Up press 1x
+      description: "Action to run, when the button is pressed one time."
       default: []
       selector:
         action: {}
-    on_held:
-      name: Press On (held)
-      description: Action to run on button press.
+    KeyPressed_Down:
+      name: Down press 1x
+      description: "Action to run, when the button is pressed one time."
       default: []
       selector:
         action: {}
-    off_1x:
-      name: Press Off (1x)
-      description: Action to run on button press.
+
+    KeyPressed2x_Up:
+      name: Up press 2x
+      description: "Action to run, when the button is pressed two time."
       default: []
       selector:
         action: {}
-    off_2x:
-      name: Press Off (2x)
-      description: Action to run on button press.
+    KeyPressed2x_Down:
+      name: Down press 2x
+      description: "Action to run, when the button is pressed two time."
       default: []
       selector:
         action: {}
-    off_3x:
-      name: Press Off (3x)
-      description: Action to run on button press.
+
+    KeyPressed3x_Up:
+      name: Up press 3x
+      description: "Action to run, when the button is pressed three time."
       default: []
       selector:
         action: {}
-    off_4x:
-      name: Press Off (4x)
-      description: Action to run on button press.
+    KeyPressed3x_Down:
+      name: Down press 3x
+      description: "Action to run, when the button is pressed three time."
       default: []
       selector:
         action: {}
-    off_5x:
-      name: Press Off (5x)
-      description: Action to run on button press.
+
+    KeyPressed4x_Up:
+      name: Up press 4x
+      description: "Action to run, when the button is pressed four time."
       default: []
       selector:
         action: {}
-    off_held:
-      name: Press Off (held)
-      description: Action to run on button press.
+    KeyPressed4x_Down:
+      name: Down press 4x
+      description: "Action to run, when the button is pressed four time."
       default: []
       selector:
         action: {}
-    on_released:
-      name: Release On
-      description: Action to run on button press.
+
+    KeyPressed5x_Up:
+      name: Up press 5x
+      description: "Action to run, when the button is pressed five time."
       default: []
       selector:
         action: {}
-    off_released:
-      name: Release Off
-      description: Action to run on button press.
+    KeyPressed5x_Down:
+      name: Down press 5x
+      description: "Action to run, when the button is pressed five time."
       default: []
       selector:
         action: {}
 
 mode: single
 max_exceeded: silent
-
 variables:
-  device_id: !input zooz_switch
-
+  device_id: !input zwave_device
 trigger:
   - platform: event
-    event_type: zwave_js_value_notification
-    event_data:
-      device_id: !input zooz_switch
-
+    event_type: zwave_js_event
+condition: "{{ trigger.event.data.device_id == device_id }}"
 action:
   - variables:
-      scene_id: "{{ trigger.event.data.property_key }}"
-      scene_data: "{{ trigger.event.data.value }}"
+      button_id: "{{ trigger.event.data.property_key_name }}"
+      press_count: "{{ trigger.event.data.value }}"
+  - service: "logbook.log"
+    data:
+      name: "Button Id"
+      message: "{{ button_id }}"
+  - service: "logbook.log"
+    data:
+      name: "Press Count"
+      message: "{{ press_count }}"
+  - service: "logbook.log"
+    data:
+      name: "Device"
+      message: "{{ zwave_device }}"
   - choose:
-    - conditions: "{{ scene_id == '001' and scene_data == 0 }}"
-      sequence: !input off_1x
-    - conditions: "{{ scene_id == '002' and scene_data == 0 }}"
-      sequence: !input on_1x
-    - conditions: "{{ scene_id == '001' and scene_data == 3 }}"
-      sequence: !input off_2x
-    - conditions: "{{ scene_id == '002' and scene_data == 3 }}"
-      sequence: !input on_2x
-    - conditions: "{{ scene_id == '001' and scene_data == 4 }}"
-      sequence: !input off_3x
-    - conditions: "{{ scene_id == '002' and scene_data == 4 }}"
-      sequence: !input on_3x
-    - conditions: "{{ scene_id == '001' and scene_data == 5 }}"
-      sequence: !input off_4x
-    - conditions: "{{ scene_id == '002' and scene_data == 5 }}"
-      sequence: !input on_4x
-    - conditions: "{{ scene_id == '001' and scene_data == 6 }}"
-      sequence: !input off_5x
-    - conditions: "{{ scene_id == '002' and scene_data == 6 }}"
-      sequence: !input on_5x
-    - conditions: "{{ scene_id == '001' and scene_data == 1 }}"
-      sequence: !input off_held
-    - conditions: "{{ scene_id == '002' and scene_data == 1 }}"
-      sequence: !input on_held
-    - conditions: "{{ scene_id == '001' and scene_data == 2 }}"
-      sequence: !input off_released
-    - conditions: "{{ scene_id == '002' and scene_data == 2 }}"
-      sequence: !input on_released
+    - conditions: '{{ button_id == "002" and press_count == "KeyPressed" }}'
+      sequence: !input KeyPressed_Down
+    - conditions: '{{ button_id == "001" and press_count == "KeyPressed" }}'
+      sequence: !input KeyPressed_Up
+
+    - conditions: '{{ button_id == "002" and press_count == "KeyPressed2x" }}'
+      sequence: !input KeyPressed2x_Down
+    - conditions: '{{ button_id == "001" and press_count == "KeyPressed2x" }}'
+      sequence: !input KeyPressed2x_Up
+
+    - conditions: '{{ button_id == "002" and press_count == "KeyPressed3x" }}'
+      sequence: !input KeyPressed3x_Down
+    - conditions: '{{ button_id == "001" and press_count == "KeyPressed3x" }}'
+      sequence: !input KeyPressed3x_Up
+
+    - conditions: '{{ button_id == "002" and press_count == "KeyPressed4x" }}'
+      sequence: !input KeyPressed4x_Down
+    - conditions: '{{ button_id == "001" and press_count == "KeyPressed4x" }}'
+      sequence: !input KeyPressed4x_Up
+
+    - conditions: '{{ button_id == "002" and press_count == "KeyPressed5x" }}'
+      sequence: !input KeyPressed5x_Down
+    - conditions: '{{ button_id == "001" and press_count == "KeyPressed5x" }}'
+      sequence: !input KeyPressed5x_Up
