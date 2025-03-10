@@ -5,7 +5,7 @@ blueprint:
   domain: automation
   input:
     zooz_switch:
-      name: Zooz Zen Switch
+      name:
       description: "List of available zwave devices. Please select the zooz 
       Zen switch that you would like to configure."
       selector:
