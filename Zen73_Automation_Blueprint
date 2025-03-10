@@ -1,16 +1,16 @@
 blueprint:
-  name: Zooz ZEN
-  description: Zooz ZEN Switch using the ZWave-JS integration. 
+  name: Zooz ZEN73
+  description: Zooz ZEN73 Switch using the ZWave-JS integration. 
   domain: automation
   input:
     zwave_device:
-      name: Zooz ZEN
+      name: Zooz ZEN73
       description: "List of available Zooz ZEN34 switch."
       selector:
           device:
             integration: zwave_js
             manufacturer: Zooz
-
+            model: ZEN73
 
 
     KeyReleased_Up:
