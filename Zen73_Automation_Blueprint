@@ -1,105 +1,104 @@
 blueprint:
-  name: Zooz ZEN34
-  description: Zooz ZEN34 Switch using the ZWave-JS integration. 
+  name: Zooz ZEN73
+  description: Zooz ZEN73 Switch using the ZWave-JS integration.
   domain: automation
   input:
     zwave_device:
-      name: Zooz ZEN34
-      description: "List of available Zooz ZEN34 switch."
+      name: Zooz ZEN73
+      description: "List of available Zooz ZEN73 switches."
       selector:
           device:
             integration: zwave_js
             manufacturer: Zooz
-            model: ZEN34
-
+            model: ZEN73
 
     KeyReleased_Up:
       name: Up Released
-      description: "Action to run, when the button is released."
+      description: "Action to run when the button is released."
       default: []
       selector:
         action: {}
     KeyReleased_Down:
       name: Down Released
-      description: "Action to run, when the button is released."
+      description: "Action to run when the button is released."
       default: []
       selector:
         action: {}
 
     KeyHeld_Up:
       name: Up Held
-      description: "Action to run, when the button is held."
+      description: "Action to run when the button is held."
       default: []
       selector:
         action: {}
     KeyHeld_Down:
       name: Down Held
-      description: "Action to run, when the button is held."
+      description: "Action to run when the button is held."
       default: []
       selector:
         action: {}
 
     KeyPressed_Up:
       name: Up press 1x
-      description: "Action to run, when the button is pressed one time."
+      description: "Action to run when the button is pressed once."
       default: []
       selector:
         action: {}
     KeyPressed_Down:
       name: Down press 1x
-      description: "Action to run, when the button is pressed one time."
+      description: "Action to run when the button is pressed once."
       default: []
       selector:
         action: {}
 
     KeyPressed2x_Up:
       name: Up press 2x
-      description: "Action to run, when the button is pressed two time."
+      description: "Action to run when the button is pressed twice."
       default: []
       selector:
         action: {}
     KeyPressed2x_Down:
       name: Down press 2x
-      description: "Action to run, when the button is pressed two time."
+      description: "Action to run when the button is pressed twice."
       default: []
       selector:
         action: {}
 
     KeyPressed3x_Up:
       name: Up press 3x
-      description: "Action to run, when the button is pressed three time."
+      description: "Action to run when the button is pressed three times."
       default: []
       selector:
         action: {}
     KeyPressed3x_Down:
       name: Down press 3x
-      description: "Action to run, when the button is pressed three time."
+      description: "Action to run when the button is pressed three times."
       default: []
       selector:
         action: {}
 
     KeyPressed4x_Up:
       name: Up press 4x
-      description: "Action to run, when the button is pressed four time."
+      description: "Action to run when the button is pressed four times."
       default: []
       selector:
         action: {}
     KeyPressed4x_Down:
       name: Down press 4x
-      description: "Action to run, when the button is pressed four time."
+      description: "Action to run when the button is pressed four times."
       default: []
       selector:
         action: {}
 
     KeyPressed5x_Up:
       name: Up press 5x
-      description: "Action to run, when the button is pressed five time."
+      description: "Action to run when the button is pressed five times."
       default: []
       selector:
         action: {}
     KeyPressed5x_Down:
       name: Down press 5x
-      description: "Action to run, when the button is pressed five time."
+      description: "Action to run when the button is pressed five times."
       default: []
       selector:
         action: {}
@@ -108,6 +107,7 @@ mode: single
 max_exceeded: silent
 variables:
   device_id: !input zwave_device
+
 trigger:
   - platform: event
     event_type: zwave_js_value_notification
@@ -116,29 +116,17 @@ action:
   - variables:
       button_id: "{{ trigger.event.data.property_key_name }}"
       press_count: "{{ trigger.event.data.value }}"
-  - service: "logbook.log"
-    data:
-      name: "Button Id"
-      message: "{{ button_id }}"
-  - service: "logbook.log"
-    data:
-      name: "Press Count"
-      message: "{{ press_count }}"
-  - service: "logbook.log"
-    data:
-      name: "Device"
-      message: "{{ zwave_device }}"
   - choose:
     - conditions: '{{ button_id == "002" and press_count == "KeyHeldDown" }}'
       sequence: !input KeyHeld_Down
     - conditions: '{{ button_id == "001" and press_count == "KeyHeldDown" }}'
       sequence: !input KeyHeld_Up
-      
+    
     - conditions: '{{ button_id == "002" and press_count == "KeyReleased" }}'
       sequence: !input KeyReleased_Down
     - conditions: '{{ button_id == "001" and press_count == "KeyReleased" }}'
       sequence: !input KeyReleased_Up
-      
+    
     - conditions: '{{ button_id == "002" and press_count == "KeyPressed" }}'
       sequence: !input KeyPressed_Down
     - conditions: '{{ button_id == "001" and press_count == "KeyPressed" }}'
