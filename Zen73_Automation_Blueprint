@@ -1,155 +1,167 @@
 blueprint:
-  name: Zooz ZEN73
-  description: Zooz ZEN73 Switch using the ZWave-JS integration. 
+  name: Zooz ZEN73 Remote scene control
+  description: |
+    Use the Zooz ZEN73 remote to trigger Scenes and control devices based on varying scenes. 
+
+    This Blueprint is currently configured for the zwaveJS platform.
+
   domain: automation
+
   input:
     zwave_device:
-      name: Zooz ZEN73
+      name: Zooz Zen34
       description: "List of available Zooz ZEN34 switch."
       selector:
-          device:
-            integration: zwave_js
-            manufacturer: Zooz
-            model: ZEN73
+        device:
+          integration: zwave_js
+          manufacturer: Zooz
+          model: ZEN73
 
-
-    KeyReleased_Up:
-      name: Up Released
-      description: "Action to run, when the button is released."
-      default: []
+    1x_tap_up:
+      name: Tap up 1x
       selector:
-        action: {}
-    KeyReleased_Down:
-      name: Down Released
-      description: "Action to run, when the button is released."
+        action:
       default: []
+    1x_tap_down:
+      name: Tap down 1x
       selector:
-        action: {}
-
-    KeyHeld_Up:
-      name: Up Held
-      description: "Action to run, when the button is held."
+        action:
       default: []
+    2x_tap_up:
+      name: Tap up 2x
       selector:
-        action: {}
-    KeyHeld_Down:
-      name: Down Held
-      description: "Action to run, when the button is held."
+        action:
       default: []
+    2x_tap_down:
+      name: Tap down 2x
       selector:
-        action: {}
-
-    KeyPressed_Up:
-      name: Up press 1x
-      description: "Action to run, when the button is pressed one time."
+        action:
       default: []
+    3x_tap_up:
+      name: Tap up 3x
       selector:
-        action: {}
-    KeyPressed_Down:
-      name: Down press 1x
-      description: "Action to run, when the button is pressed one time."
+        action:
       default: []
+    3x_tap_down:
+      name: Tap down 3x
       selector:
-        action: {}
-
-    KeyPressed2x_Up:
-      name: Up press 2x
-      description: "Action to run, when the button is pressed two time."
+        action:
       default: []
+    4x_tap_up:
+      name: Tap up 4x
       selector:
-        action: {}
-    KeyPressed2x_Down:
-      name: Down press 2x
-      description: "Action to run, when the button is pressed two time."
+        action:
       default: []
+    4x_tap_down:
+      name: Tap down 4x
       selector:
-        action: {}
-
-    KeyPressed3x_Up:
-      name: Up press 3x
-      description: "Action to run, when the button is pressed three time."
+        action:
       default: []
+    5x_tap_up:
+      name: Tap up 5x
       selector:
-        action: {}
-    KeyPressed3x_Down:
-      name: Down press 3x
-      description: "Action to run, when the button is pressed three time."
+        action:
       default: []
+    5x_tap_down:
+      name: Tap down 5x
       selector:
-        action: {}
-
-    KeyPressed4x_Up:
-      name: Up press 4x
-      description: "Action to run, when the button is pressed four time."
+        action:
       default: []
+    hold_up:
+      name: Hold up
       selector:
-        action: {}
-    KeyPressed4x_Down:
-      name: Down press 4x
-      description: "Action to run, when the button is pressed four time."
+        action:
       default: []
+    hold_down:
+      name: Hold down
       selector:
-        action: {}
-
-    KeyPressed5x_Up:
-      name: Up press 5x
-      description: "Action to run, when the button is pressed five time."
+        action:
       default: []
-      selector:
-        action: {}
-    KeyPressed5x_Down:
-      name: Down press 5x
-      description: "Action to run, when the button is pressed five time."
-      default: []
-      selector:
-        action: {}
 
 mode: single
-max_exceeded: silent
+
 variables:
+  logger: blueprint.zwave_scene_activation
   device_id: !input zwave_device
+
 trigger:
   - platform: event
-    event_type: zwave_js_event
-condition: "{{ trigger.event.data.device_id == device_id }}"
+    event_type: zwave_js_value_notification
+
 action:
-  - variables:
-      button_id: "{{ trigger.event.data.property_key_name }}"
-      press_count: "{{ trigger.event.data.value }}"
-  - service: "logbook.log"
-    data:
-      name: "Button Id"
-      message: "{{ button_id }}"
-  - service: "logbook.log"
-    data:
-      name: "Press Count"
-      message: "{{ press_count }}"
-  - service: "logbook.log"
-    data:
-      name: "Device"
-      message: "{{ zwave_device }}"
   - choose:
-    - conditions: '{{ button_id == "002" and press_count == "KeyPressed" }}'
-      sequence: !input KeyPressed_Down
-    - conditions: '{{ button_id == "001" and press_count == "KeyPressed" }}'
-      sequence: !input KeyPressed_Up
-
-    - conditions: '{{ button_id == "002" and press_count == "KeyPressed2x" }}'
-      sequence: !input KeyPressed2x_Down
-    - conditions: '{{ button_id == "001" and press_count == "KeyPressed2x" }}'
-      sequence: !input KeyPressed2x_Up
-
-    - conditions: '{{ button_id == "002" and press_count == "KeyPressed3x" }}'
-      sequence: !input KeyPressed3x_Down
-    - conditions: '{{ button_id == "001" and press_count == "KeyPressed3x" }}'
-      sequence: !input KeyPressed3x_Up
-
-    - conditions: '{{ button_id == "002" and press_count == "KeyPressed4x" }}'
-      sequence: !input KeyPressed4x_Down
-    - conditions: '{{ button_id == "001" and press_count == "KeyPressed4x" }}'
-      sequence: !input KeyPressed4x_Up
-
-    - conditions: '{{ button_id == "002" and press_count == "KeyPressed5x" }}'
-      sequence: !input KeyPressed5x_Down
-    - conditions: '{{ button_id == "001" and press_count == "KeyPressed5x" }}'
-      sequence: !input KeyPressed5x_Up
+      # IF triggered node_id is zwave_nodeid
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.device_id == device_id }}"
+        sequence:
+          - choose:
+              # IF 1x tap up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyPressed' }}"
+                sequence: !input 1x_tap_up
+              # IF 1x tap down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyPressed' }}"
+                sequence: !input 1x_tap_down
+              # IF 2x tap up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyPressed2x' }}"
+                sequence: !input 2x_tap_up
+              # IF 2x tap down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyPressed2x' }}"
+                sequence: !input 2x_tap_down
+              # IF 3x tap up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyPressed3x' }}"
+                sequence: !input 3x_tap_up
+              # IF 3x tap down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyPressed3x' }}"
+                sequence: !input 3x_tap_down
+              # IF 4x tap up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyPressed4x' }}"
+                sequence: !input 4x_tap_up
+              # IF 4x tap down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyPressed4x' }}"
+                sequence: !input 4x_tap_down
+              # IF 5x tap up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyPressed5x' }}"
+                sequence: !input 5x_tap_up
+              # IF 5x tap down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyPressed5x' }}"
+                sequence: !input 5x_tap_down
+              # IF hold up
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 001' and trigger.event.data.value == 'KeyHeld' }}"
+                sequence: !input hold_up
+              # IF hold down
+              - conditions:
+                  - condition: template
+                    value_template: "{{ trigger.event.data.label == 'Scene 002' and trigger.event.data.value == 'KeyHeld' }}"
+                sequence: !input hold_down
+            # ELSE: unhandled label/value
+            default:
+              - service: system_log.write
+                data:
+                  level: debug
+                  logger: "{{ logger }}"
+                  message: "Activated scene '{{ trigger.event.data.scene_label }}' ({{ trigger.event.data.label }}) with value '{{ trigger.event.data.scene_value_label }}' ({{ trigger.event.data.value }}) for node '{{ zwave_nodeid }}' ({{ trigger.event.data.node_id }})"
+    # ELSE: unhandled zwave event
+    default: []
