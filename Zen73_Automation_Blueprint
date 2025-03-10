@@ -10,7 +10,7 @@ blueprint:
           device:
             integration: zwave_js
             manufacturer: Zooz
-            model: 
+
 
 
     KeyReleased_Up:
