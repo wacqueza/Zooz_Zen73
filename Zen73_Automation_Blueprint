@@ -1,16 +1,16 @@
 blueprint:
   name: Zooz Zen73 Template
-  description: Create automations for Zooz Zen Switches using scenes
+  description: Create automations for Zooz Zen73 Switches using scenes
   source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen_blueprint_template.yaml
   domain: automation
   input:
     zooz_switch:
-      name:
-      description: "List of available zwave devices. Please select the zooz 
-      Zen switch that you would like to configure."
+      name: Zooz Zen73 Switch
+      description: "Select the Zooz Zen73 switch to configure."
       selector:
         entity:
-          domain:
+          integration: zwave_js
+          domain: switch
 
     on_1x:
       name: Press On (1x)
@@ -102,58 +102,43 @@ max_exceeded: silent
 
 variables:
   device_id: !input zooz_switch
-#   ozw_node_id: !input ozw_node_id
 
 trigger:
   - platform: event
-    event_type: zwave.scene_activated
+    event_type: zwave_js_value_notification
     event_data:
-      entity_id: !input zooz_switch
+      device_id: !input zooz_switch
 
 action:
   - variables:
-      scene_id: "{{ trigger.event.data.scene_id }}"
-      scene_data: "{{ trigger.event.data.scene_data }}"
+      scene_id: "{{ trigger.event.data.property_key }}"
+      scene_data: "{{ trigger.event.data.value }}"
   - choose:
-    # Down 1x
-    - conditions: "{{ scene_id == 1 and scene_data == 7680}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 0 }}"
       sequence: !input off_1x
-    # Up 1x
-    - conditions: "{{ scene_id == 2 and scene_data == 7680}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 0 }}"
       sequence: !input on_1x
-    # Down 2x
-    - conditions: "{{ scene_id == 1 and scene_data == 7860}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 3 }}"
       sequence: !input off_2x
-    # Up 2x
-    - conditions: "{{ scene_id == 2 and scene_data == 7860}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 3 }}"
       sequence: !input on_2x
-    # Down 3x
-    - conditions: "{{ scene_id == 1 and scene_data == 7920}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 4 }}"
       sequence: !input off_3x
-    # Up 3x
-    - conditions: "{{ scene_id == 2 and scene_data == 7920}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 4 }}"
       sequence: !input on_3x
-    # Down 4x
-    - conditions: "{{ scene_id == 1 and scene_data == 7980}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 5 }}"
       sequence: !input off_4x
-    # Up 4x
-    - conditions: "{{ scene_id == 2 and scene_data == 7980}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 5 }}"
       sequence: !input on_4x
-    # Down 5x
-    - conditions: "{{ scene_id == 1 and scene_data == 8040}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 6 }}"
       sequence: !input off_5x
-    # Up 5x
-    - conditions: "{{ scene_id == 2 and scene_data == 8040}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 6 }}"
       sequence: !input on_5x
-    # Held Down
-    - conditions: "{{ scene_id == 1 and scene_data == 7800}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 1 }}"
       sequence: !input off_held
-    # Held Up
-    - conditions: "{{ scene_id == 2 and scene_data == 7800}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 1 }}"
       sequence: !input on_held
-    # Released Down
-    - conditions: "{{ scene_id == 1 and scene_data == 7740}}"
+    - conditions: "{{ scene_id == '001' and scene_data == 2 }}"
       sequence: !input off_released
-    # Released Up
-    - conditions: "{{ scene_id == 2 and scene_data == 7740}}"
+    - conditions: "{{ scene_id == '002' and scene_data == 2 }}"
       sequence: !input on_released
